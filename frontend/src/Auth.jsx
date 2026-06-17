@@ -22,6 +22,7 @@ function Auth({ onLogin }) {
       const response = await fetch(`${API}${endpoint}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
+        credentials: 'include', // Added to support CORS/cookies
         body: JSON.stringify(body),
       });
 

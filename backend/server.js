@@ -9,7 +9,13 @@ const authRoutes = require('./auth');
 dotenv.config();
 
 const app = express();
-app.use(cors());
+
+// Explicit CORS configuration to allow your Vercel frontend
+app.use(cors({
+  origin: ['https://url-shortener-ten-lime.vercel.app', 'http://localhost:5173'],
+  credentials: true
+}));
+
 app.use(express.json());
 
 initDB();
@@ -133,7 +139,7 @@ app.delete('/urls/:id', authenticateToken, async (req, res) => {
   }
 });
 
-// REDIRECT short URL — must be last!
+// REDIRECT short URL
 app.get('/:code', async (req, res) => {
   try {
     const { code } = req.params;

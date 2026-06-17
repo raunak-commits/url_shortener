@@ -18,7 +18,8 @@ function Dashboard({ user, token, onLogout }) {
   const loadUrls = async () => {
     try {
       const res = await fetch(`${API}/urls`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { 'Authorization': `Bearer ${token}` },
+        credentials: 'include'
       });
       const data = await res.json();
       setUrls(data.urls || []);
@@ -39,6 +40,7 @@ function Dashboard({ user, token, onLogout }) {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token}`
         },
+        credentials: 'include',
         body: JSON.stringify({ original_url: input, title })
       });
 
@@ -69,7 +71,8 @@ function Dashboard({ user, token, onLogout }) {
     try {
       await fetch(`${API}/urls/${id}`, {
         method: 'DELETE',
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { 'Authorization': `Bearer ${token}` },
+        credentials: 'include'
       });
       setUrls(prev => prev.filter(u => u.id !== id));
       if (analytics?.url?.id === id) setAnalytics(null);
@@ -81,7 +84,8 @@ function Dashboard({ user, token, onLogout }) {
   const loadAnalytics = async (id) => {
     try {
       const res = await fetch(`${API}/urls/${id}/analytics`, {
-        headers: { 'Authorization': `Bearer ${token}` }
+        headers: { 'Authorization': `Bearer ${token}` },
+        credentials: 'include'
       });
       const data = await res.json();
       setAnalytics(data);
