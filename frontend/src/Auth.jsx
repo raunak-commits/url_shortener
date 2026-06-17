@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-const API = 'http://localhost:5000';
+const API = 'https://urlshortener-production-de71.up.railway.app';
 
 function Auth({ onLogin }) {
   const [isLogin, setIsLogin] = useState(true);

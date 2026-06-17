@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-const API = 'http://localhost:5000';
+const API = 'https://urlshortener-production-de71.up.railway.app';
 
 function Dashboard({ user, token, onLogout }) {
   const [urls, setUrls] = useState([]);
