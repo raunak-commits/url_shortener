@@ -1,17 +1,19 @@
 const { Pool } = require('pg');
 require('dotenv').config();
 
+// Use the DATABASE_URL provided by Railway
 const pool = new Pool({
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  database: process.env.DB_NAME,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  ssl: { rejectUnauthorized: false } // <--- THIS IS THE ONLY MISSING PIECE
+  connectionString: process.env.DATABASE_URL,
+  ssl: { 
+    rejectUnauthorized: false 
+  }
 });
 
 const initDB = async () => {
   try {
+    // Test connection
+    await pool.query('SELECT 1');
+    
     await pool.query(`
       CREATE TABLE IF NOT EXISTS users (
         id SERIAL PRIMARY KEY,
