@@ -132,6 +132,9 @@ body {
 .dashboard {
   min-height: 100vh;
   background: #0f0f0f;
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
 }
 
 .header {
@@ -319,6 +322,7 @@ body {
 .url-info {
   flex: 1;
   overflow: hidden;
+  min-width: 0;
 }
 
 .url-title {
@@ -335,6 +339,8 @@ body {
   overflow: hidden;
   text-overflow: ellipsis;
   margin-bottom: 3px;
+  max-width: 100%;
+  display: block;
 }
 
 .url-short a {
