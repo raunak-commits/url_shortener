@@ -489,6 +489,10 @@ body {
     align-items: flex-start;
   }
 
+  .url-info {
+    width: 100%;
+  }
+
   .url-actions {
     width: 100%;
   }
