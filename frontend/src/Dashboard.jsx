@@ -10,6 +10,7 @@ function Dashboard({ user, token, onLogout }) {
   const [error, setError] = useState('');
   const [copied, setCopied] = useState(null);
   const [analytics, setAnalytics] = useState(null);
+  const [analyticsLoading, setAnalyticsLoading] = useState(null); // The new loading state
 
   useEffect(() => {
     loadUrls();
@@ -88,7 +89,9 @@ function Dashboard({ user, token, onLogout }) {
     }
   };
 
+  // The updated function with loading states
   const loadAnalytics = async (id) => {
+    setAnalyticsLoading(id);
     try {
       const res = await fetch(`${API}/urls/${id}/analytics`, {
         headers: { 'Authorization': `Bearer ${token}` },
@@ -99,6 +102,8 @@ function Dashboard({ user, token, onLogout }) {
       setTimeout(scrollToAnalytics, 100);
     } catch (err) {
       console.error(err);
+    } finally {
+      setAnalyticsLoading(null);
     }
   };
 
@@ -181,8 +186,13 @@ function Dashboard({ user, token, onLogout }) {
                 <button className="action-btn copy" onClick={() => copyToClipboard(url.short_code)}>
                   {copied === url.short_code ? 'Copied!' : 'Copy'}
                 </button>
-                <button className="action-btn analytics" onClick={() => loadAnalytics(url.id)}>
-                  Analytics
+                {/* The updated Analytics button */}
+                <button 
+                  className="action-btn analytics" 
+                  onClick={() => loadAnalytics(url.id)}
+                  disabled={analyticsLoading === url.id}
+                >
+                  {analyticsLoading === url.id ? 'Loading...' : 'Analytics'}
                 </button>
                 <button className="action-btn delete" onClick={() => deleteUrl(url.id)}>
                   Delete
@@ -206,17 +216,17 @@ function Dashboard({ user, token, onLogout }) {
                   <div className="stat-label">Total Clicks</div>
                 </div>
                 <div className="stat-box">
-                  <div className="stat-number">{analytics.deviceBreakdown.mobile || 0}</div>
+                  <div className="stat-number">{analytics.deviceBreakdown?.mobile || 0}</div>
                   <div className="stat-label">Mobile</div>
                 </div>
                 <div className="stat-box">
-                  <div className="stat-number">{analytics.deviceBreakdown.desktop || 0}</div>
+                  <div className="stat-number">{analytics.deviceBreakdown?.desktop || 0}</div>
                   <div className="stat-label">Desktop</div>
                 </div>
               </div>
               <div className="analytics-breakdown">
                 <h3>Browser Breakdown</h3>
-                {Object.entries(analytics.browserBreakdown).map(([browser, count]) => (
+                {analytics.browserBreakdown && Object.entries(analytics.browserBreakdown).map(([browser, count]) => (
                   <div key={browser} className="breakdown-row">
                     <span>{browser}</span>
                     <span>{count} clicks</span>
