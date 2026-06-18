@@ -40,13 +40,37 @@ app.get('/health', (req, res) => {
   res.json({ status: 'Server is running!' });
 });
 
+// --- Analytics Helper Functions ---
+const detectBrowser = (userAgent) => {
+  if (!userAgent) return 'Other';
+  const ua = userAgent.toLowerCase();
+  
+  if (ua.includes('edg/')) return 'Edge';
+  if (ua.includes('opr/') || ua.includes('opera')) return 'Opera';
+  if (ua.includes('chrome/')) return 'Chrome';
+  if (ua.includes('firefox/')) return 'Firefox';
+  if (ua.includes('safari/') && !ua.includes('chrome/')) return 'Safari';
+  
+  return 'Other';
+};
+
+const detectDevice = (userAgent) => {
+  if (!userAgent) return 'desktop';
+  return /mobile/i.test(userAgent) ? 'mobile' : 'desktop';
+};
+
 // CREATE short URL
 app.post('/urls', authenticateToken, async (req, res) => {
   try {
     const { original_url, title } = req.body;
-    const cleanUrl = original_url.trim();
+    let cleanUrl = original_url.trim();
 
     if (!cleanUrl) return res.status(400).json({ error: 'URL is required' });
+
+    // Automatically add https:// if missing
+    if (!/^https?:\/\//i.test(cleanUrl)) {
+      cleanUrl = `https://${cleanUrl}`;
+    }
 
     try { new URL(cleanUrl); } catch { return res.status(400).json({ error: 'Invalid URL format' }); }
 
@@ -63,7 +87,7 @@ app.post('/urls', authenticateToken, async (req, res) => {
   }
 });
 
-// GET all URLs for user (FIXED with JOIN for accurate counts)
+// GET all URLs for user
 app.get('/urls', authenticateToken, async (req, res) => {
   try {
     const result = await pool.query(`
@@ -126,9 +150,10 @@ app.get('/:code', async (req, res) => {
     if (result.rows.length === 0) return res.status(404).json({ error: 'URL not found' });
 
     const url = result.rows[0];
-    const ua = req.headers['user-agent'] || '';
-    const device = /mobile/i.test(ua) ? 'mobile' : 'desktop';
-    const browser = /chrome/i.test(ua) ? 'Chrome' : /firefox/i.test(ua) ? 'Firefox' : /safari/i.test(ua) ? 'Safari' : 'Other';
+    const userAgentString = req.headers['user-agent'] || '';
+    
+    const device = detectDevice(userAgentString);
+    const browser = detectBrowser(userAgentString);
 
     await pool.query('INSERT INTO clicks (url_id, device, browser) VALUES ($1, $2, $3)', [url.id, device, browser]);
     res.redirect(url.original_url);

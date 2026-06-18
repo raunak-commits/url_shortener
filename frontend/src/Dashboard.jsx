@@ -15,6 +15,13 @@ function Dashboard({ user, token, onLogout }) {
     loadUrls();
   }, []);
 
+  const scrollToAnalytics = () => {
+    const section = document.getElementById('analytics-section');
+    if (section) {
+      section.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
   const loadUrls = async () => {
     try {
       const res = await fetch(`${API}/urls`, {
@@ -89,6 +96,7 @@ function Dashboard({ user, token, onLogout }) {
       });
       const data = await res.json();
       setAnalytics(data);
+      setTimeout(scrollToAnalytics, 100);
     } catch (err) {
       console.error(err);
     }
@@ -185,37 +193,39 @@ function Dashboard({ user, token, onLogout }) {
         </div>
 
         {/* ANALYTICS PANEL */}
-        {analytics && (
-          <div className="analytics-card">
-            <div className="analytics-header">
-              <h2>Analytics — {analytics.url.title || analytics.url.short_code}</h2>
-              <button onClick={() => setAnalytics(null)} className="close-btn">✕</button>
-            </div>
-            <div className="analytics-stats">
-              <div className="stat-box">
-                <div className="stat-number">{analytics.totalClicks}</div>
-                <div className="stat-label">Total Clicks</div>
+        <div id="analytics-section">
+          {analytics && (
+            <div className="analytics-card">
+              <div className="analytics-header">
+                <h2>Analytics — {analytics.url.title || analytics.url.short_code}</h2>
+                <button onClick={() => setAnalytics(null)} className="close-btn">✕</button>
               </div>
-              <div className="stat-box">
-                <div className="stat-number">{analytics.deviceBreakdown.mobile || 0}</div>
-                <div className="stat-label">Mobile</div>
-              </div>
-              <div className="stat-box">
-                <div className="stat-number">{analytics.deviceBreakdown.desktop || 0}</div>
-                <div className="stat-label">Desktop</div>
-              </div>
-            </div>
-            <div className="analytics-breakdown">
-              <h3>Browser Breakdown</h3>
-              {Object.entries(analytics.browserBreakdown).map(([browser, count]) => (
-                <div key={browser} className="breakdown-row">
-                  <span>{browser}</span>
-                  <span>{count} clicks</span>
+              <div className="analytics-stats">
+                <div className="stat-box">
+                  <div className="stat-number">{analytics.totalClicks}</div>
+                  <div className="stat-label">Total Clicks</div>
                 </div>
-              ))}
+                <div className="stat-box">
+                  <div className="stat-number">{analytics.deviceBreakdown.mobile || 0}</div>
+                  <div className="stat-label">Mobile</div>
+                </div>
+                <div className="stat-box">
+                  <div className="stat-number">{analytics.deviceBreakdown.desktop || 0}</div>
+                  <div className="stat-label">Desktop</div>
+                </div>
+              </div>
+              <div className="analytics-breakdown">
+                <h3>Browser Breakdown</h3>
+                {Object.entries(analytics.browserBreakdown).map(([browser, count]) => (
+                  <div key={browser} className="breakdown-row">
+                    <span>{browser}</span>
+                    <span>{count} clicks</span>
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );
