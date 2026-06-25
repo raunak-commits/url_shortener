@@ -10,7 +10,7 @@ function Dashboard({ user, token, onLogout }) {
   const [error, setError] = useState('');
   const [copied, setCopied] = useState(null);
   const [analytics, setAnalytics] = useState(null);
-  const [analyticsLoading, setAnalyticsLoading] = useState(null); // The new loading state
+  const [analyticsLoading, setAnalyticsLoading] = useState(null); 
 
   useEffect(() => {
     loadUrls();
@@ -89,7 +89,7 @@ function Dashboard({ user, token, onLogout }) {
     }
   };
 
-  // The updated function with loading states
+  // The fully updated function with state syncing
   const loadAnalytics = async (id) => {
     setAnalyticsLoading(id);
     try {
@@ -98,7 +98,17 @@ function Dashboard({ user, token, onLogout }) {
         credentials: 'include'
       });
       const data = await res.json();
+      
+      // Update the bottom panel with fresh database data
       setAnalytics(data);
+      
+      // Sync the top URL card with the exact same fresh database data
+      setUrls(prevUrls => 
+        prevUrls.map(url => 
+          url.id === id ? { ...url, clicks: data.totalClicks } : url
+        )
+      );
+
       setTimeout(scrollToAnalytics, 100);
     } catch (err) {
       console.error(err);
@@ -186,7 +196,6 @@ function Dashboard({ user, token, onLogout }) {
                 <button className="action-btn copy" onClick={() => copyToClipboard(url.short_code)}>
                   {copied === url.short_code ? 'Copied!' : 'Copy'}
                 </button>
-                {/* The updated Analytics button */}
                 <button 
                   className="action-btn analytics" 
                   onClick={() => loadAnalytics(url.id)}
